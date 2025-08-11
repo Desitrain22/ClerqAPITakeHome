@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run ACME Settlement Service",
+      "type": "shell",
+      "command": "/Users/npatel/Documents/GitHub/ACME/.venv/bin/python",
+      "args": ["run.py"],
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

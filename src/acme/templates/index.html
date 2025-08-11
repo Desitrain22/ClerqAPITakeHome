@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ACME Settlement Service</title>
+    <style>
+      /* Import Inter font */
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      /* CSS Variables - Clerq Design System */
+      :root {
+        --primary-blue: #2563eb;
+        --primary-dark: #1e40af;
+        --success-green: #059669;
+        --accent-orange: #ea580c;
+        --text-primary: #374151;
+        --text-secondary: #6b7280;
+        --text-light: #9ca3af;
+        --bg-white: #ffffff;
+        --bg-light: #f3f4f6;
+        --border-light: #e5e7eb;
+        --border-medium: #d1d5db;
+        --space-xs: 8px;
+        --space-sm: 16px;
+        --space-md: 24px;
+        --space-lg: 32px;
+        --space-xl: 48px;
+        --space-2xl: 64px;
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg-light);
+        min-height: 100vh;
+        padding: var(--space-md);
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--text-primary);
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        color: var(--text-primary);
+        margin-bottom: var(--space-2xl);
+      }
+
+      .header h1 {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: var(--space-xs);
+        color: var(--primary-blue);
+      }
+
+      .header p {
+        font-size: 16px;
+        color: var(--text-secondary);
+      }
+
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-lg);
+        margin-bottom: var(--space-lg);
+      }
+
+      .card {
+        background: var(--bg-white);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: var(--space-md);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card h2 {
+        color: var(--text-primary);
+        margin-bottom: var(--space-md);
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: var(--space-md);
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+
+      .form-group select,
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        font-size: 16px;
+        color: var(--text-primary);
+        background: var(--bg-white);
+        transition: border-color 0.2s ease;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .form-group select:focus,
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .btn {
+        background: var(--primary-blue);
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .btn:hover {
+        background: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+      }
+
+      .btn:disabled {
+        background: var(--border-light);
+        color: var(--text-light);
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .status-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-md);
+        color: var(--text-primary);
+      }
+
+      .status-indicator {
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .status-healthy {
+        background: rgba(5, 150, 105, 0.1);
+        color: var(--success-green);
+        border: 1px solid rgba(5, 150, 105, 0.2);
+      }
+
+      .status-unhealthy {
+        background: rgba(234, 88, 12, 0.1);
+        color: var(--accent-orange);
+        border: 1px solid rgba(234, 88, 12, 0.2);
+      }
+
+      .status-checking {
+        background: rgba(107, 114, 128, 0.1);
+        color: var(--text-secondary);
+        border: 1px solid rgba(107, 114, 128, 0.2);
+      }
+
+      .results-section {
+        grid-column: 1 / -1;
+      }
+
+      .result-card {
+        background: var(--bg-white);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: var(--space-lg);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-top: var(--space-md);
+      }
+
+      .result-card h2 {
+        color: var(--text-primary);
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: var(--space-md);
+      }
+
+      .result-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+      }
+
+      .summary-item {
+        text-align: center;
+        padding: var(--space-md);
+        background: var(--bg-light);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-light);
+      }
+
+      .summary-item h3 {
+        color: var(--text-secondary);
+        margin-bottom: var(--space-xs);
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+
+      .summary-item .value {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--primary-blue);
+      }
+
+      .transaction-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        background: var(--bg-white);
+      }
+
+      .transaction-item {
+        padding: var(--space-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+      }
+
+      .transaction-item:nth-child(even) {
+        background: var(--bg-light);
+      }
+
+      .transaction-item:nth-child(odd) {
+        background: var(--bg-white);
+      }
+
+      .transaction-item:last-child {
+        border-bottom: none;
+      }
+
+      .transaction-type {
+        padding: var(--space-xs);
+        border-radius: var(--radius-sm);
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .type-purchase,
+      .type-sale {
+        background: rgba(5, 150, 105, 0.1);
+        color: var(--success-green);
+        border: 1px solid rgba(5, 150, 105, 0.2);
+      }
+
+      .type-refund {
+        background: rgba(234, 88, 12, 0.1);
+        color: var(--accent-orange);
+        border: 1px solid rgba(234, 88, 12, 0.2);
+      }
+
+      .loading {
+        text-align: center;
+        padding: var(--space-xl);
+        color: var(--text-secondary);
+        font-size: 16px;
+      }
+
+      .error {
+        background: rgba(234, 88, 12, 0.1);
+        color: var(--accent-orange);
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+        margin: var(--space-md) 0;
+        border: 1px solid rgba(234, 88, 12, 0.2);
+        border-left: 4px solid var(--accent-orange);
+      }
+
+      .warning {
+        background: rgba(234, 88, 12, 0.05);
+        color: var(--text-primary);
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+        margin: var(--space-md) 0;
+        border: 1px solid rgba(234, 88, 12, 0.2);
+        border-left: 4px solid var(--accent-orange);
+      }
+
+      .api-errors-section {
+        margin-top: var(--space-lg);
+        background: var(--bg-light);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        border: 1px solid var(--border-light);
+        border-left: 4px solid var(--accent-orange);
+      }
+
+      .api-errors-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-sm);
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .api-errors-header .error-count {
+        background: var(--accent-orange);
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: var(--space-xs);
+      }
+
+      .error-item {
+        background: var(--bg-white);
+        border-radius: var(--radius-sm);
+        padding: var(--space-sm);
+        margin-bottom: var(--space-xs);
+        border: 1px solid var(--border-light);
+        border-left: 3px solid var(--accent-orange);
+      }
+
+      .error-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .error-meta {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-xs);
+        font-weight: 500;
+      }
+
+      .error-details {
+        font-size: 14px;
+        color: var(--text-primary);
+        line-height: 1.5;
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          grid-template-columns: 1fr;
+        }
+
+        .header h1 {
+          font-size: 36px;
+        }
+
+        .result-summary {
+          grid-template-columns: 1fr;
+        }
+
+        .card {
+          padding: var(--space-sm);
+        }
+
+        .result-card {
+          padding: var(--space-md);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🏛️ ACME Settlement Service</h1>
+      </div>
+
+      <div class="main-content">
+        <!-- Settlement Calculator -->
+        <div class="card">
+          <h2>Settlement Calculator</h2>
+          <form id="settlementForm">
+            <div class="form-group">
+              <label for="merchant">Select Merchant:</label>
+              <select id="merchant" required>
+                <option value="">Loading merchants...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="date">Settlement Date:</label>
+              <input type="date" id="date" required />
+            </div>
+
+            <div class="form-group">
+              <label for="timezone">Timezone:</label>
+              <select id="timezone" required>
+                <option value="">Detecting timezone...</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn" id="calculateBtn">
+              Calculate Settlement
+            </button>
+          </form>
+        </div>
+
+        <!-- Service Status -->
+        <div class="card">
+          <h2>Service Status</h2>
+          <div class="status-card">
+            <span>API Health:</span>
+            <div class="status-indicator status-checking" id="healthStatus">
+              Checking...
+            </div>
+          </div>
+
+          <div class="status-card">
+            <span>ACME API:</span>
+            <div class="status-indicator status-checking" id="acmeStatus">
+              Checking...
+            </div>
+          </div>
+
+          <button
+            class="btn"
+            onclick="checkHealth()"
+            style="margin-top: var(--space-md)"
+          >
+            Refresh Status
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="results-section" id="resultsSection" style="display: none">
+        <div class="result-card">
+          <h2>Settlement Results</h2>
+          <div id="resultsContent"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let merchants = [];
+
+      // Initialize the application
+      document.addEventListener('DOMContentLoaded', function () {
+        loadMerchants();
+        checkHealth();
+        setDefaultDate();
+        setupTimezoneSelect();
+
+        // Form submission
+        document
+          .getElementById('settlementForm')
+          .addEventListener('submit', handleCalculateSettlement);
+      });
+
+      // Set default date to yesterday
+      function setDefaultDate() {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        document.getElementById('date').value = yesterday
+          .toISOString()
+          .split('T')[0];
+      }
+
+      // Setup timezone selector with common timezones and auto-detect user's timezone
+      function setupTimezoneSelect() {
+        const timezoneSelect = document.getElementById('timezone');
+
+        // Common timezones list
+        const commonTimezones = [
+          'America/New_York',
+          'America/Chicago',
+          'America/Denver',
+          'America/Los_Angeles',
+          'America/Toronto',
+          'Europe/London',
+          'Europe/Paris',
+          'Europe/Berlin',
+          'Asia/Tokyo',
+          'Asia/Shanghai',
+          'Asia/Kolkata',
+          'Australia/Sydney',
+          'UTC',
+        ];
+
+        // Try to detect user's timezone
+        let userTimezone;
+        try {
+          userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        } catch (e) {
+          userTimezone = 'UTC';
+        }
+
+        // Clear loading option
+        timezoneSelect.innerHTML = '';
+
+        // Add user's detected timezone first if it's not in common list
+        if (!commonTimezones.includes(userTimezone)) {
+          const userOption = document.createElement('option');
+          userOption.value = userTimezone;
+          userOption.textContent = `${userTimezone} (Detected)`;
+          userOption.selected = true;
+          timezoneSelect.appendChild(userOption);
+
+          // Add separator
+          const separator = document.createElement('option');
+          separator.disabled = true;
+          separator.textContent = '─────────────────';
+          timezoneSelect.appendChild(separator);
+        }
+
+        // Add common timezones
+        commonTimezones.forEach((tz) => {
+          const option = document.createElement('option');
+          option.value = tz;
+          option.textContent = tz;
+
+          // Select user's timezone if it's in the common list
+          if (tz === userTimezone) {
+            option.selected = true;
+            option.textContent = `${tz} (Detected)`;
+          }
+
+          timezoneSelect.appendChild(option);
+        });
+      }
+
+      // Load merchants for dropdown
+      async function loadMerchants() {
+        try {
+          const response = await fetch('/merchants');
+          const data = await response.json();
+
+          const merchantSelect = document.getElementById('merchant');
+          merchantSelect.innerHTML =
+            '<option value="">Select a merchant...</option>';
+
+          if (data.merchants) {
+            merchants = data.merchants;
+            data.merchants.forEach((merchant) => {
+              const option = document.createElement('option');
+              option.value = merchant.id;
+              option.textContent = merchant.name;
+              merchantSelect.appendChild(option);
+            });
+          } else {
+            merchantSelect.innerHTML =
+              '<option value="">Error loading merchants</option>';
+          }
+        } catch (error) {
+          console.error('Error loading merchants:', error);
+          document.getElementById('merchant').innerHTML =
+            '<option value="">Error loading merchants</option>';
+        }
+      }
+
+      // Check service health
+      async function checkHealth() {
+        const healthStatus = document.getElementById('healthStatus');
+        const acmeStatus = document.getElementById('acmeStatus');
+
+        healthStatus.textContent = 'Checking...';
+        healthStatus.className = 'status-indicator status-checking';
+        acmeStatus.textContent = 'Checking...';
+        acmeStatus.className = 'status-indicator status-checking';
+
+        try {
+          const response = await fetch('/health');
+          const data = await response.json();
+
+          if (response.ok && data.status === 'healthy') {
+            healthStatus.textContent = 'Healthy';
+            healthStatus.className = 'status-indicator status-healthy';
+
+            acmeStatus.textContent = 'Connected';
+            acmeStatus.className = 'status-indicator status-healthy';
+          } else {
+            healthStatus.textContent = 'Unhealthy';
+            healthStatus.className = 'status-indicator status-unhealthy';
+
+            acmeStatus.textContent = 'Disconnected';
+            acmeStatus.className = 'status-indicator status-unhealthy';
+          }
+        } catch (error) {
+          console.error('Health check failed:', error);
+          healthStatus.textContent = 'Error';
+          healthStatus.className = 'status-indicator status-unhealthy';
+
+          acmeStatus.textContent = 'Error';
+          acmeStatus.className = 'status-indicator status-unhealthy';
+        }
+      }
+
+      // Handle settlement calculation
+      async function handleCalculateSettlement(event) {
+        event.preventDefault();
+
+        const merchantId = document.getElementById('merchant').value;
+        const date = document.getElementById('date').value;
+        const timezone = document.getElementById('timezone').value;
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsContent = document.getElementById('resultsContent');
+
+        if (!merchantId || !date || !timezone) {
+          alert('Please select a merchant, date, and timezone');
+          return;
+        }
+
+        // Show loading state
+        calculateBtn.disabled = true;
+        calculateBtn.textContent = 'Calculating...';
+        resultsSection.style.display = 'block';
+        resultsContent.innerHTML =
+          '<div class="loading">🔄 Calculating settlement...</div>';
+
+        try {
+          const response = await fetch(
+            `/settlement?merchant_id=${merchantId}&date=${date}&timezone=${encodeURIComponent(
+              timezone
+            )}`
+          );
+          const data = await response.json();
+
+          if (response.ok) {
+            displayResults(data);
+          } else {
+            displayError(data.error || 'Unknown error occurred');
+          }
+        } catch (error) {
+          console.error('Settlement calculation failed:', error);
+          displayError('Network error: Unable to calculate settlement');
+        } finally {
+          calculateBtn.disabled = false;
+          calculateBtn.textContent = 'Calculate Settlement';
+        }
+      }
+
+      // Display settlement results
+      function displayResults(data) {
+        const resultsContent = document.getElementById('resultsContent');
+
+        const merchantName =
+          merchants.find((m) => m.id === data.merchant_id)?.name ||
+          'Unknown Merchant';
+
+        // Generate API errors section if errors exist
+        const apiErrorsSection = data.api_errors
+          ? `
+          <div class="api-errors-section">
+            <div class="api-errors-header">
+              <div class="error-count">${data.api_errors.total_errors}</div>
+              <span>API Errors Encountered During Settlement Calculation</span>
+            </div>
+            <div class="warning">
+              <strong>Warning:</strong> ${
+                data.api_errors.total_errors
+              } API error(s) occurred during settlement calculation. 
+              The results may be incomplete. Please review the errors below and consider retrying.
+            </div>
+            ${data.api_errors.error_details
+              .map(
+                (error) => `
+              <div class="error-item">
+                <div class="error-meta">
+                  ${error.operation ? `Operation: ${error.operation}` : ''}
+                  ${error.page ? `Page: ${error.page}` : ''}
+                  ${error.attempt ? `Attempt: ${error.attempt}` : ''}
+                  ${
+                    error.status_code ? `Status Code: ${error.status_code}` : ''
+                  }
+                  ${error.error_type ? `Type: ${error.error_type}` : ''}
+                </div>
+                <div class="error-details">
+                  ${error.error || error.details || 'Unknown error'}
+                  ${error.error_message ? ` - ${error.error_message}` : ''}
+                </div>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        `
+          : '';
+
+        resultsContent.innerHTML = `
+                <div style="margin-bottom: var(--space-lg);">
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-xs); font-size: 24px; font-weight: 600;">Settlement for ${merchantName}</h3>
+                    <p style="color: var(--text-secondary); font-size: 16px;">Date: ${
+                      data.settlement_date
+                    }</p>
+                    <p style="color: var(--text-light); font-size: 14px;">Period: ${new Date(
+                      data.settlement_period.start
+                    ).toLocaleString()} - ${new Date(
+          data.settlement_period.end
+        ).toLocaleString()}</p>
+                </div>
+
+                ${apiErrorsSection}
+                
+                <div class="result-summary">
+                    <div class="summary-item">
+                        <h3>Settlement Amount</h3>
+                        <div class="value">$${parseFloat(
+                          data.settlement_amount
+                        ).toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Total Purchases</h3>
+                        <div class="value">$${parseFloat(
+                          data.summary.total_purchases
+                        ).toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Total Refunds</h3>
+                        <div class="value">$${parseFloat(
+                          data.summary.total_refunds
+                        ).toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Transaction Count</h3>
+                        <div class="value">${
+                          data.summary.transaction_count
+                        }</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: var(--space-lg);">
+                    <h3 style="color: var(--text-primary); margin-bottom: var(--space-sm); font-size: 20px; font-weight: 600;">Transaction Details</h3>
+                    <div class="transaction-list">
+                        ${
+                          data.transactions.length > 0
+                            ? data.transactions
+                                .map(
+                                  (transaction) => `
+                                <div class="transaction-item">
+                                    <div>
+                                        <div style="font-weight: 600; margin-bottom: var(--space-xs); color: var(--text-primary);">
+                                            Transaction ${transaction.id.substring(
+                                              0,
+                                              8
+                                            )}...
+                                        </div>
+                                        <div style="font-size: 14px; color: var(--text-secondary);">
+                                            ${new Date(
+                                              transaction.created_at
+                                            ).toLocaleString()}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="transaction-type type-${transaction.type.toLowerCase()}">
+                                            ${transaction.type}
+                                        </div>
+                                        <div style="font-weight: 600; margin-top: var(--space-xs); color: var(--text-primary); font-size: 16px;">
+                                            $${parseFloat(
+                                              transaction.amount
+                                            ).toFixed(2)}
+                                        </div>
+                                    </div>
+                                </div>
+                            `
+                                )
+                                .join('')
+                            : '<div style="padding: var(--space-lg); text-align: center; color: var(--text-secondary);">No transactions found for this period</div>'
+                        }
+                    </div>
+                </div>
+            `;
+      }
+
+      // Display error message
+      function displayError(message) {
+        const resultsContent = document.getElementById('resultsContent');
+        resultsContent.innerHTML = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+      }
+    </script>
+  </body>
+</html>

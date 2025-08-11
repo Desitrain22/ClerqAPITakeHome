@@ -1,0 +1,182 @@
+/* ACME Settlement Service - Clerq Design System Styles */
+
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* CSS Variables - Clerq Design System */
+:root {
+  --primary-blue: #2563eb;
+  --primary-dark: #1e40af;
+  --success-green: #059669;
+  --accent-orange: #ea580c;
+  --text-primary: #374151;
+  --text-secondary: #6b7280;
+  --text-light: #9ca3af;
+  --bg-white: #ffffff;
+  --bg-light: #f3f4f6;
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-2xl: 64px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+/* Utility Classes */
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-light {
+  color: var(--text-light);
+}
+.bg-white {
+  background: var(--bg-white);
+}
+.bg-light {
+  background: var(--bg-light);
+}
+
+/* Button Variants */
+.btn-secondary {
+  background: transparent;
+  color: var(--primary-blue);
+  border: 2px solid var(--primary-blue);
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn-secondary:hover {
+  background: var(--primary-blue);
+  color: white;
+}
+
+.btn-success {
+  background: var(--success-green);
+  color: white;
+}
+
+.btn-success:hover {
+  background: #047857;
+}
+
+.btn-warning {
+  background: var(--accent-orange);
+  color: white;
+}
+
+.btn-warning:hover {
+  background: #c2410c;
+}
+
+/* Card Variants */
+.card-elevated {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-success {
+  border-left: 4px solid var(--success-green);
+}
+
+.card-warning {
+  border-left: 4px solid var(--accent-orange);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading {
+  animation: pulse 1.5s infinite;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Notification styles */
+.notification {
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  margin: var(--space-sm) 0;
+  border: 1px solid;
+  font-weight: 500;
+}
+
+.notification-success {
+  background: rgba(5, 150, 105, 0.1);
+  color: var(--success-green);
+  border-color: rgba(5, 150, 105, 0.2);
+}
+
+.notification-error {
+  background: rgba(234, 88, 12, 0.1);
+  color: var(--accent-orange);
+  border-color: rgba(234, 88, 12, 0.2);
+}
+
+.notification-info {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary-blue);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* Table styles for future use */
+.table-striped tr:nth-child(even) {
+  background: var(--bg-light);
+}
+
+.table-striped tr:nth-child(odd) {
+  background: var(--bg-white);
+}
+
+*:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  .btn {
+    display: none !important;
+  }
+}
