@@ -2,6 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 import logging
 import time
+import os
 import random
 import requests
 from zoneinfo import ZoneInfo
@@ -11,7 +12,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ACME API Configuration
-ACME_API_BASE_URL = "https://api-engine-dev.clerq.io/tech_assessment"
+ACME_API_BASE_URL = os.getenv(
+    "ACME_API_BASE_URL", "https://api-engine-dev.clerq.io/tech_assessment"
+)
 
 
 class ACMEAPIClient:
